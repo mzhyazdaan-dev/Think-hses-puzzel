@@ -3,56 +3,60 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Infinite Brain Game</title>
+<title>Infinite Brain Game Pro</title>
 
 <style>
 body {
   margin:0;
   font-family: Arial;
-  background: linear-gradient(135deg,#1C2B4A,#0f1a2e);
+  background: linear-gradient(135deg,#0f172a,#1e293b);
   color:#fff;
   text-align:center;
 }
 
-.container {
-  padding:20px;
+.container { padding:20px; }
+
+h1 { color:#facc15; }
+
+.stats {
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  flex-wrap:wrap;
 }
 
-h1 {
-  color:#FFB800;
+.stat {
+  background:#1e293b;
+  padding:10px;
+  border-radius:10px;
+  font-size:14px;
 }
 
 .card {
-  background:#24385c;
+  background: linear-gradient(145deg,#1e293b,#0f172a);
   padding:25px;
   border-radius:15px;
   margin-top:20px;
-  animation: fade 0.4s ease;
+  box-shadow:0 10px 25px rgba(0,0,0,0.4);
+  animation:fade 0.3s ease;
 }
 
 @keyframes fade {
   from {opacity:0; transform:translateY(10px);}
-  to {opacity:1; transform:translateY(0);}
+  to {opacity:1;}
 }
 
 button {
   padding:12px 20px;
-  margin-top:12px;
+  margin-top:10px;
   border:none;
   border-radius:8px;
-  background:#FFB800;
+  background:#facc15;
   cursor:pointer;
   font-weight:bold;
-  transition:0.2s;
 }
 
-button:hover {
-  background:#ffc933;
-}
-
-button:active {
-  transform:scale(0.95);
-}
+button:active { transform:scale(0.95); }
 
 input {
   padding:10px;
@@ -61,17 +65,15 @@ input {
   margin-top:10px;
 }
 
-.stats {
-  display:flex;
-  justify-content:center;
-  gap:15px;
-  margin-top:15px;
+#result {
+  font-weight:bold;
+  margin-top:10px;
+  transition:0.2s;
 }
 
-.stat {
-  background:#2f4b7c;
-  padding:10px;
-  border-radius:8px;
+.mode {
+  font-size:12px;
+  color:#aaa;
 }
 </style>
 </head>
@@ -79,13 +81,15 @@ input {
 <body>
 
 <div class="container">
-  <h1>⚡ Infinite Brain Game</h1>
+  <h1>⚡ Infinite Brain Game PRO</h1>
 
   <div class="stats">
     <div class="stat">Score: <span id="score">0</span></div>
     <div class="stat">Streak: <span id="streak">0</span></div>
     <div class="stat">Level: <span id="level">1</span></div>
   </div>
+
+  <p class="mode" id="mode"></p>
 
   <div class="card">
     <h2 id="question">Loading...</h2>
@@ -100,7 +104,6 @@ input {
   <button onclick="nextPuzzle()">Next Puzzle</button>
 </div>
 
-<!-- sounds -->
 <audio id="correctSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
 <audio id="wrongSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
 
@@ -114,78 +117,103 @@ document.getElementById("streak").innerText = streak;
 document.getElementById("level").innerText = level;
 
 let currentAnswer = "";
+let currentType = "";
 
 function random(min,max){
   return Math.floor(Math.random()*(max-min+1))+min;
 }
 
 function generatePuzzle(){
-  const types = ["math","pattern","logic","square","double"];
-  let type = types[random(0,types.length-1)];
+  const types = ["math","pattern","logic","sequence","memory","square","double"];
+  currentType = types[random(0,types.length-1)];
 
-  // difficulty increase
-  let difficulty = Math.min(level,50);
+  document.getElementById("mode").innerText = "Mode: " + currentType.toUpperCase();
 
-  if(type==="math"){
-    let a = random(1,10*difficulty);
-    let b = random(1,10*difficulty);
-    currentAnswer = (a+b).toString();
-    return `${a} + ${b} = ?`;
+  if(currentType==="math"){
+    let a=random(1,level*10);
+    let b=random(1,level*10);
+    currentAnswer=(a+b).toString();
+    return `🧮 ${a} + ${b} = ?`;
   }
 
-  if(type==="pattern"){
-    let n = random(2,5);
-    currentAnswer = (n*4).toString();
-    return `${n}, ${n*2}, ${n*3}, ?`;
+  if(currentType==="pattern"){
+    let n=random(2,5);
+    currentAnswer=(n*4).toString();
+    return `📊 ${n}, ${n*2}, ${n*3}, ?`;
   }
 
-  if(type==="logic"){
-    currentAnswer = "10";
-    return "A=1, B=2, C=3 → A+B+C+D = ?";
+  if(currentType==="logic"){
+    currentAnswer="10";
+    return "🧠 A=1 B=2 C=3 → A+B+C+D=?";
   }
 
-  if(type==="square"){
-    let n = random(2,10);
-    currentAnswer = (n*n).toString();
-    return `${n}² = ?`;
+  if(currentType==="sequence"){
+    currentAnswer="F";
+    return "🔤 A, B, C, D, E, ?";
   }
 
-  if(type==="double"){
-    let n = random(2,20);
-    currentAnswer = (n*2).toString();
-    return `${n} × 2 = ?`;
+  if(currentType==="square"){
+    let n=random(2,12);
+    currentAnswer=(n*n).toString();
+    return `🔢 ${n}² = ?`;
   }
+
+  if(currentType==="double"){
+    let n=random(5,20);
+    currentAnswer=(n*2).toString();
+    return `⚡ ${n} × 2 = ?`;
+  }
+
+  if(currentType==="memory"){
+    let num=random(100,999);
+    currentAnswer=num.toString();
+
+    setTimeout(()=>{
+      document.getElementById("question").innerText="🤯 What was the number?";
+    },2000);
+
+    return `👁️ Remember: ${num}`;
+  }
+}
+
+function showResult(text,color){
+  let el=document.getElementById("result");
+  el.innerText=text;
+  el.style.color=color;
+  el.style.transform="scale(1.2)";
+  setTimeout(()=>{el.style.transform="scale(1)"},200);
 }
 
 function nextPuzzle(){
-  document.getElementById("result").innerText="";
   document.getElementById("answerInput").value="";
-  document.getElementById("question").innerText = generatePuzzle();
+  document.getElementById("result").innerText="";
+  document.getElementById("question").innerText=generatePuzzle();
 }
 
 function checkAnswer(){
-  let user = document.getElementById("answerInput").value.trim();
+  let user=document.getElementById("answerInput").value.trim();
 
-  if(user === currentAnswer){
+  if(user===currentAnswer){
     score++;
     streak++;
     level++;
-
-    document.getElementById("result").innerText="✅ Correct!";
+    showResult("✅ Correct!","lightgreen");
     document.getElementById("correctSound").play();
+    if(navigator.vibrate) navigator.vibrate(100);
   } else {
-    streak = 0;
-    document.getElementById("result").innerText="❌ Wrong! Answer: "+currentAnswer;
+    streak=0;
+    showResult("❌ Wrong! Answer: "+currentAnswer,"red");
     document.getElementById("wrongSound").play();
+    if(navigator.vibrate) navigator.vibrate([200,100,200]);
   }
 
   localStorage.setItem("score",score);
   localStorage.setItem("streak",streak);
   localStorage.setItem("level",level);
 
-  document.getElementById("score").innerText = score;
-  document.getElementById("streak").innerText = streak;
-  document.getElementById("level").innerText = level;
+  document.getElementById("score").innerText=score;
+  document.getElementById("streak").innerText=streak;
+  document.getElementById("level").innerText=level;
 }
 
 nextPuzzle();
