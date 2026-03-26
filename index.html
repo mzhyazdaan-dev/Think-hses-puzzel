@@ -1,222 +1,283 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Infinite Brain Game Pro</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Puzzle Game - HSES Connect Pro</title>
+    <style>
+        :root {
+            --primary: #FFB800;
+            --secondary: #00d4ff;
+            --success: #00c864;
+            --danger: #FF6348;
+            --bg-dark: #1C2B4A;
+        }
 
-<style>
-body {
-  margin:0;
-  font-family: Arial;
-  background: linear-gradient(135deg,#0f172a,#1e293b);
-  color:#fff;
-  text-align:center;
-}
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-.container { padding:20px; }
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at top, #2d3f5a 0%, #1C2B4A 100%);
+            color: #fff;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
 
-h1 { color:#facc15; }
+        .container { width: 100%; max-width: 600px; }
 
-.stats {
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  flex-wrap:wrap;
-}
+        /* Header & Branding */
+        .header { text-align: center; margin-bottom: 25px; }
+        .header h1 { color: var(--primary); font-size: 32px; letter-spacing: 1px; }
+        .hses-badge {
+            background: rgba(255, 184, 0, 0.1);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 8px;
+            margin: 10px 0;
+            display: inline-block;
+        }
 
-.stat {
-  background:#1e293b;
-  padding:10px;
-  border-radius:10px;
-  font-size:14px;
-}
+        /* Stats Grid */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .stat-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            border-bottom: 3px solid transparent;
+        }
+        .stat-solved { border-color: var(--primary); }
+        .stat-streak { border-color: var(--secondary); }
+        .stat-best { border-color: var(--success); }
+        .stat-level { border-color: var(--danger); }
+        .stat-value { font-size: 20px; font-weight: bold; display: block; }
+        .stat-label { font-size: 10px; text-transform: uppercase; color: #aaa; }
 
-.card {
-  background: linear-gradient(145deg,#1e293b,#0f172a);
-  padding:25px;
-  border-radius:15px;
-  margin-top:20px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.4);
-  animation:fade 0.3s ease;
-}
+        /* Puzzle Card */
+        .puzzle-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            transition: transform 0.3s ease;
+        }
 
-@keyframes fade {
-  from {opacity:0; transform:translateY(10px);}
-  to {opacity:1;}
-}
+        .puzzle-type { color: var(--primary); font-weight: bold; font-size: 14px; }
+        .facts-box { margin: 15px 0; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; }
+        .fact { font-size: 15px; margin-bottom: 8px; color: #e0e0e0; }
+        
+        /* Input Area */
+        .input-group { margin: 20px 0; }
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 18px;
+            text-align: center;
+            outline: none;
+            transition: 0.3s;
+        }
+        input[type="text"]:focus { border-color: var(--primary); background: rgba(255,255,255,0.1); }
 
-button {
-  padding:12px 20px;
-  margin-top:10px;
-  border:none;
-  border-radius:8px;
-  background:#facc15;
-  cursor:pointer;
-  font-weight:bold;
-}
+        .btn-main {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: var(--primary);
+            color: var(--bg-dark);
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-main:hover { transform: translateY(-2px); opacity: 0.9; }
+        .btn-main:disabled { background: #555; cursor: not-allowed; }
 
-button:active { transform:scale(0.95); }
+        /* Result Section */
+        #resultArea { margin-top: 20px; display: none; padding: 15px; border-radius: 10px; animation: slideUp 0.4s ease; }
+        .success-msg { background: rgba(0, 200, 100, 0.15); border: 1px solid var(--success); color: var(--success); }
+        .fail-msg { background: rgba(255, 99, 72, 0.15); border: 1px solid var(--danger); color: var(--danger); }
 
-input {
-  padding:10px;
-  border-radius:6px;
-  border:none;
-  margin-top:10px;
-}
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-#result {
-  font-weight:bold;
-  margin-top:10px;
-  transition:0.2s;
-}
+        .nav-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .btn-nav { padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px; cursor: pointer; }
 
-.mode {
-  font-size:12px;
-  color:#aaa;
-}
-</style>
+        .hidden { display: none; }
+        .active { display: block !important; }
+    </style>
 </head>
-
 <body>
 
 <div class="container">
-  <h1>⚡ Infinite Brain Game PRO</h1>
+    <div id="gameView" class="view active">
+        <div class="header">
+            <div class="hses-badge">⚡ HASAN  SMART  ELECTRICAL  SOLUTIONS</div>
+            <h1>INFINITE PUZZLE</h1>
+        </div>
 
-  <div class="stats">
-    <div class="stat">Score: <span id="score">0</span></div>
-    <div class="stat">Streak: <span id="streak">0</span></div>
-    <div class="stat">Level: <span id="level">1</span></div>
-  </div>
+        <div class="stats-bar">
+            <div class="stat-box stat-solved"><span class="stat-label">Solved</span><span class="stat-value" id="s-solved">0</span></div>
+            <div class="stat-box stat-streak"><span class="stat-label">Streak</span><span class="stat-value" id="s-streak">0</span></div>
+            <div class="stat-box stat-best"><span class="stat-label">Best</span><span class="stat-value" id="s-best">0</span></div>
+            <div class="stat-box stat-level"><span class="stat-label">Level</span><span class="stat-value" id="s-level">1</span></div>
+        </div>
 
-  <p class="mode" id="mode"></p>
+        <div class="puzzle-card">
+            <span class="puzzle-type" id="p-type">LOGIC</span>
+            <h2 id="p-title" style="margin: 5px 0;">Loading...</h2>
+            
+            <div class="facts-box" id="p-facts"></div>
 
-  <div class="card">
-    <h2 id="question">Loading...</h2>
+            <div class="input-group">
+                <input type="text" id="userAnswer" placeholder="Type your answer here..." autocomplete="off">
+            </div>
 
-    <input id="answerInput" placeholder="Your answer..." />
-    <br>
-    <button onclick="checkAnswer()">Submit</button>
+            <button class="btn-main" id="checkBtn" onclick="checkAnswer()">CHECK ANSWER</button>
 
-    <p id="result"></p>
-  </div>
+            <div id="resultArea">
+                <p id="resultText" style="font-weight: bold;"></p>
+                <p id="explanationText" style="font-size: 13px; margin-top: 5px; opacity: 0.9;"></p>
+                <button class="btn-main" style="margin-top: 15px; background: #fff;" onclick="nextPuzzle()">NEXT PUZZLE →</button>
+            </div>
+        </div>
 
-  <button onclick="nextPuzzle()">Next Puzzle</button>
+        <div class="nav-buttons">
+            <button class="btn-nav" onclick="resetGame()">🔄 Reset Progress</button>
+            <button class="btn-nav" onclick="alert('HSES Connect: Solve puzzles to sharpen your electrical logic!')">ℹ️ Help</button>
+        </div>
+    </div>
 </div>
 
-<audio id="correctSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
-<audio id="wrongSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
-
 <script>
-let score = Number(localStorage.getItem("score")) || 0;
-let streak = Number(localStorage.getItem("streak")) || 0;
-let level = Number(localStorage.getItem("level")) || 1;
+    let state = {
+        solved: 0,
+        streak: 0,
+        best: 0,
+        currentAnswer: ""
+    };
 
-document.getElementById("score").innerText = score;
-document.getElementById("streak").innerText = streak;
-document.getElementById("level").innerText = level;
+    // Puzzles Template & Generator
+    const templates = {
+        logic: [
+            { t: "The Sibling Riddle", f: ["Rahul has 4 sisters", "Each sister has 1 brother"], q: "How many brothers does Rahul have?", a: "0", e: "Rahul is the only brother!" },
+            { t: "Weight Logic", f: ["A brick weighs 1kg + half a brick"], q: "How much does the brick weigh? (kg)", a: "2", e: "x = 1 + 0.5x, so x = 2" }
+        ],
+        pattern: [
+            { t: "Step Sequence", f: ["2, 6, 12, 20, 30, ?"], q: "Next number?", a: "42", e: "Added +4, +6, +8, +10, then +12" }
+        ]
+    };
 
-let currentAnswer = "";
-let currentType = "";
+    function generateDynamicMath() {
+        const ops = ['+', '-', '*'];
+        const op = ops[Math.floor(Math.random() * 3)];
+        const a = Math.floor(Math.random() * 20) + 5;
+        const b = Math.floor(Math.random() * 15) + 2;
+        let ans = op === '+' ? a + b : op === '-' ? a - b : a * b;
+        return {
+            t: "Quick Math",
+            f: [`Value A: ${a}`, `Value B: ${b}`],
+            q: `What is ${a} ${op} ${b}?`,
+            a: ans.toString(),
+            e: `Calculated using standard arithmetic.`
+        };
+    }
 
-function random(min,max){
-  return Math.floor(Math.random()*(max-min+1))+min;
-}
+    function loadPuzzle() {
+        const isMath = Math.random() > 0.5;
+        let p;
+        if(isMath) {
+            p = generateDynamicMath();
+            document.getElementById('p-type').innerText = "⚡ ELECTRICAL MATH";
+        } else {
+            const keys = Object.keys(templates);
+            const cat = templates[keys[Math.floor(Math.random() * keys.length)]];
+            p = cat[Math.floor(Math.random() * cat.length)];
+            document.getElementById('p-type').innerText = "🧠 LOGIC DEDUCTION";
+        }
 
-function generatePuzzle(){
-  const types = ["math","pattern","logic","sequence","memory","square","double"];
-  currentType = types[random(0,types.length-1)];
+        document.getElementById('p-title').innerText = p.t;
+        document.getElementById('p-facts').innerHTML = p.f.map(f => `<p class="fact">📍 ${f}</p>`).join('') + `<p class="fact" style="color:var(--primary); font-weight:bold; margin-top:10px;">❓ ${p.q}</p>`;
+        
+        state.currentAnswer = p.a.toLowerCase().trim();
+        state.currentExplanation = p.e;
+        
+        // Reset UI
+        document.getElementById('userAnswer').value = "";
+        document.getElementById('userAnswer').disabled = false;
+        document.getElementById('checkBtn').style.display = "block";
+        document.getElementById('resultArea').style.display = "none";
+    }
 
-  document.getElementById("mode").innerText = "Mode: " + currentType.toUpperCase();
+    function checkAnswer() {
+        const userInp = document.getElementById('userAnswer').value.toLowerCase().trim();
+        const resArea = document.getElementById('resultArea');
+        const resText = document.getElementById('resultText');
+        
+        if(!userInp) return alert("Please enter an answer!");
 
-  if(currentType==="math"){
-    let a=random(1,level*10);
-    let b=random(1,level*10);
-    currentAnswer=(a+b).toString();
-    return `🧮 ${a} + ${b} = ?`;
-  }
+        resArea.style.display = "block";
+        document.getElementById('checkBtn').style.display = "none";
+        document.getElementById('userAnswer').disabled = true;
 
-  if(currentType==="pattern"){
-    let n=random(2,5);
-    currentAnswer=(n*4).toString();
-    return `📊 ${n}, ${n*2}, ${n*3}, ?`;
-  }
+        if(userInp === state.currentAnswer) {
+            state.solved++;
+            state.streak++;
+            if(state.streak > state.best) state.best = state.streak;
+            
+            resArea.className = "success-msg";
+            resText.innerText = "✅ EXCELLENT! CORRECT.";
+        } else {
+            state.streak = 0;
+            resArea.className = "fail-msg";
+            resText.innerText = `❌ WRONG. Correct was: ${state.currentAnswer.toUpperCase()}`;
+        }
 
-  if(currentType==="logic"){
-    currentAnswer="10";
-    return "🧠 A=1 B=2 C=3 → A+B+C+D=?";
-  }
+        document.getElementById('explanationText').innerText = "💡 " + state.currentExplanation;
+        save();
+        updateStats();
+    }
 
-  if(currentType==="sequence"){
-    currentAnswer="F";
-    return "🔤 A, B, C, D, E, ?";
-  }
+    function nextPuzzle() {
+        loadPuzzle();
+    }
 
-  if(currentType==="square"){
-    let n=random(2,12);
-    currentAnswer=(n*n).toString();
-    return `🔢 ${n}² = ?`;
-  }
+    function updateStats() {
+        document.getElementById('s-solved').innerText = state.solved;
+        document.getElementById('s-streak').innerText = state.streak;
+        document.getElementById('s-best').innerText = state.best;
+        document.getElementById('s-level').innerText = Math.floor(state.solved / 5) + 1;
+    }
 
-  if(currentType==="double"){
-    let n=random(5,20);
-    currentAnswer=(n*2).toString();
-    return `⚡ ${n} × 2 = ?`;
-  }
+    function save() { localStorage.setItem('hses_puzzle_data', JSON.stringify(state)); }
+    
+    function resetGame() {
+        if(confirm("Are you sure? This will wipe all records.")) {
+            localStorage.clear();
+            location.reload();
+        }
+    }
 
-  if(currentType==="memory"){
-    let num=random(100,999);
-    currentAnswer=num.toString();
-
-    setTimeout(()=>{
-      document.getElementById("question").innerText="🤯 What was the number?";
-    },2000);
-
-    return `👁️ Remember: ${num}`;
-  }
-}
-
-function showResult(text,color){
-  let el=document.getElementById("result");
-  el.innerText=text;
-  el.style.color=color;
-  el.style.transform="scale(1.2)";
-  setTimeout(()=>{el.style.transform="scale(1)"},200);
-}
-
-function nextPuzzle(){
-  document.getElementById("answerInput").value="";
-  document.getElementById("result").innerText="";
-  document.getElementById("question").innerText=generatePuzzle();
-}
-
-function checkAnswer(){
-  let user=document.getElementById("answerInput").value.trim();
-
-  if(user===currentAnswer){
-    score++;
-    streak++;
-    level++;
-    showResult("✅ Correct!","lightgreen");
-    document.getElementById("correctSound").play();
-    if(navigator.vibrate) navigator.vibrate(100);
-  } else {
-    streak=0;
-    showResult("❌ Wrong! Answer: "+currentAnswer,"red");
-    document.getElementById("wrongSound").play();
-    if(navigator.vibrate) navigator.vibrate([200,100,200]);
-  }
-
-  localStorage.setItem("score",score);
-  localStorage.setItem("streak",streak);
-  localStorage.setItem("level",level);
-
-  document.getElementById("score").innerText=score;
-  document.getElementById("streak").innerText=streak;
-  document.getElementById("level").innerText=level;
-}
-
-nextPuzzle();
+    // Init
+    window.onload = () => {
+        const saved = localStorage.getItem('hses_puzzle_data');
+        if(saved) state = JSON.parse(saved);
+        updateStats();
+        loadPuzzle();
+    };
 </script>
 
 </body>
