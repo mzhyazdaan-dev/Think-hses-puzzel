@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Infinite Brain Game</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  margin:0;
+  font-family: Arial;
+  background:#1C2B4A;
+  color:#fff;
+  text-align:center;
+}
+
+.container {
+  padding:20px;
+}
+
+.card {
+  background:#24385c;
+  padding:20px;
+  border-radius:10px;
+  margin-top:20px;
+}
+
+button {
+  padding:10px 20px;
+  margin-top:10px;
+  border:none;
+  border-radius:6px;
+  background:#FFB800;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.stats {
+  display:flex;
+  justify-content:center;
+  gap:20px;
+  margin-top:20px;
+}
+
+.stat {
+  background:#2f4b7c;
+  padding:10px;
+  border-radius:8px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>⚡ Infinite Brain Game</h1>
+
+  <div class="stats">
+    <div class="stat">Score: <span id="score">0</span></div>
+    <div class="stat">Streak: <span id="streak">0</span></div>
+  </div>
+
+  <div class="card">
+    <h2 id="question">Loading...</h2>
+
+    <input id="answerInput" placeholder="Type answer" style="padding:8px; margin-top:10px;" />
+
+    <br>
+    <button onclick="checkAnswer()">Submit</button>
+
+    <p id="result"></p>
+  </div>
+
+  <button onclick="nextPuzzle()">Next Puzzle</button>
+</div>
+
+<script>
+let score = localStorage.getItem("score") || 0;
+let streak = localStorage.getItem("streak") || 0;
+
+document.getElementById("score").innerText = score;
+document.getElementById("streak").innerText = streak;
+
+let currentAnswer = "";
+
+function generatePuzzle() {
+  const types = ["math", "pattern", "logic"];
+  const type = types[Math.floor(Math.random()*types.length)];
+
+  if(type === "math") {
+    let a = Math.floor(Math.random()*50);
+    let b = Math.floor(Math.random()*50);
+    currentAnswer = (a+b).toString();
+    return `${a} + ${b} = ?`;
+  }
+
+  if(type === "pattern") {
+    let n = Math.floor(Math.random()*5)+2;
+    currentAnswer = (n*4).toString();
+    return `${n}, ${n*2}, ${n*3}, ?`;
+  }
+
+  if(type === "logic") {
+    currentAnswer = "10";
+    return "A=1, B=2, C=3 → A+B+C+D = ?";
+  }
+}
+
+function nextPuzzle() {
+  document.getElementById("result").innerText = "";
+  document.getElementById("answerInput").value = "";
+  document.getElementById("question").innerText = generatePuzzle();
+}
+
+function checkAnswer() {
+  let user = document.getElementById("answerInput").value.trim();
+
+  if(user === currentAnswer) {
+    score++;
+    streak++;
+    document.getElementById("result").innerText = "✅ Correct!";
+  } else {
+    streak = 0;
+    document.getElementById("result").innerText = "❌ Wrong! Answer: " + currentAnswer;
+  }
+
+  localStorage.setItem("score", score);
+  localStorage.setItem("streak", streak);
+
+  document.getElementById("score").innerText = score;
+  document.getElementById("streak").innerText = streak;
+}
+
+nextPuzzle();
+</script>
+
+</body>
+</html>
